@@ -2,7 +2,7 @@
 Checks that Pylint does not complain about various
 methods on Django model fields.
 """
-#  pylint: disable=C0111,W5101
+#  pylint: disable=missing-docstring
 from __future__ import print_function
 from datetime import datetime, date
 from decimal import Decimal
@@ -18,6 +18,7 @@ class LotsOfFieldsModel(models.Model):
     datetimefield = models.DateTimeField(auto_now_add=True)
     datefield = models.DateField(auto_now_add=True)
     decimalfield = models.DecimalField(max_digits=5, decimal_places=2)
+    durationfield = models.DurationField()
     emailfield = models.EmailField()
     filefield = models.FileField(name='test_file', upload_to='test')
     filepathfield = models.FilePathField()
@@ -68,6 +69,11 @@ class LotsOfFieldsModel(models.Model):
 
     def decimalfield_tests(self):
         print(self.decimalfield.compare(Decimal('1.4')))
+
+    def durationfield_tests(self):
+        now = datetime.now()
+        print(now - self.durationfield)
+        print(self.durationfield.total_seconds())
 
     def filefield_tests(self):
         print(self.filefield.file)

@@ -407,6 +407,16 @@ def is_model_meta_subclass(node):
     return node_is_subclass(node.parent, *parents)
 
 
+def is_model_factory_meta_subclass(node):
+    """Checks that node is derivative of DjangoModelFactory class."""
+    if node.name != 'Meta' or not isinstance(node.parent, ClassDef):
+        return False
+
+    parents = ('factory.django.DjangoModelFactory',
+               '.DjangoModelFactory',)
+    return node_is_subclass(node.parent, *parents)
+
+
 def is_model_mpttmeta_subclass(node):
     """Checks that node is derivative of MPTTMeta class."""
     if node.name != 'MPTTMeta' or not isinstance(node.parent, ClassDef):
@@ -715,15 +725,16 @@ def apply_augmentations(linter):
         suppress_message(linter, _visit_attribute(TypeChecker), 'E1101', generic_is_view_attribute(parents, attrs))
 
     # formviews have too many ancestors, there's nothing the user of the library can do about that
-    suppress_message(linter, _visit_class(MisdesignChecker), 'R0901', is_class('django.views.generic.edit.FormView'))
+    suppress_message(linter, _visit_class(MisdesignChecker), 'too-many-ancestors', is_class('django.views.generic.edit.FormView'))
 
     # model forms have no __init__ method anywhere in their bases
     suppress_message(linter, _visit_class(ClassChecker), 'W0232', is_class('django.forms.models.ModelForm'))
 
     # forms implement __getitem__ but not __len__, thus raising a "Badly implemented container" warning which
-    # we will suppress.
-    suppress_message(linter, _leave_class(MisdesignChecker), 'R0924', is_class('django.forms.forms.Form'))
-    suppress_message(linter, _leave_class(MisdesignChecker), 'R0924', is_class('django.forms.models.ModelForm'))
+    # we will suppress. NOTE: removed from pylint, https://github.com/PyCQA/pylint/issues/112
+    # keeping here in case it gets re-implemented
+    # suppress_message(linter, _leave_class(MisdesignChecker), 'R0924', is_class('django.forms.forms.Form'))
+    # suppress_message(linter, _leave_class(MisdesignChecker), 'R0924', is_class('django.forms.models.ModelForm'))
 
     # Meta
     suppress_message(linter, _visit_class(DocStringChecker), 'missing-docstring', is_model_meta_subclass)
@@ -738,14 +749,6 @@ def apply_augmentations(linter):
     suppress_message(linter, _visit_class(NewStyleConflictChecker), 'old-style-class', is_model_media_subclass)
     suppress_message(linter, _visit_class(ClassChecker), 'no-init', is_model_media_subclass)
     suppress_message(linter, _leave_class(MisdesignChecker), 'too-few-public-methods', is_model_media_subclass)
-
-    # Too few public methods started appearing for Views and Models as part of Pylint>=1.4 / astroid>=1.3.3
-    # Not sure why, suspect this is a failure to get the parent classes somewhere
-    # For now, just suppress it on models and views
-    suppress_message(linter, _leave_class(MisdesignChecker), 'too-few-public-methods',
-                     is_class('.Model'))
-    suppress_message(linter, _leave_class(MisdesignChecker), 'too-few-public-methods',
-                     is_class('.View'))
 
     # Admin
     # Too many public methods (40+/20)
@@ -771,6 +774,12 @@ def apply_augmentations(linter):
     suppress_message(linter, _visit_class(NewStyleConflictChecker), 'old-style-class', is_model_mpttmeta_subclass)
     suppress_message(linter, _visit_class(ClassChecker), 'W0232', is_model_mpttmeta_subclass)
     suppress_message(linter, _leave_class(MisdesignChecker), 'too-few-public-methods', is_model_mpttmeta_subclass)
+
+    # factory_boy's DjangoModelFactory
+    suppress_message(linter, _visit_class(DocStringChecker), 'missing-docstring', is_model_factory_meta_subclass)
+    suppress_message(linter, _visit_class(NewStyleConflictChecker), 'old-style-class', is_model_factory_meta_subclass)
+    suppress_message(linter, _visit_class(ClassChecker), 'W0232', is_model_factory_meta_subclass)
+    suppress_message(linter, _leave_class(MisdesignChecker), 'too-few-public-methods', is_model_factory_meta_subclass)
 
     # ForeignKey and OneToOneField
     # Must update this in a thread safe way to support the parallel option on pylint (-j)

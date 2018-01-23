@@ -1,6 +1,7 @@
 from django.db.models import fields as django_fields
 import datetime
 from decimal import Decimal
+from uuid import UUID
 
 
 # --------
@@ -110,6 +111,12 @@ class TimeField(datetime.time, django_fields.TimeField):
             pass
 
 
+class DurationField(datetime.timedelta, django_fields.DurationField):
+    if PY3:
+        def __new__(cls, verbose_name=None, name=None, **kwargs):
+            pass
+
+
 # -------
 # misc
 
@@ -118,4 +125,8 @@ class GenericIPAddressField(str, django_fields.GenericIPAddressField):
 
 
 class IPAddressField(str, django_fields.IPAddressField):
+    pass
+
+
+class UUIDField(UUID, django_fields.UUIDField):
     pass

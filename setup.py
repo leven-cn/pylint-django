@@ -5,7 +5,7 @@ import os
 import sys
 
 
-_version = '0.7.4'
+_version = '0.8.0'
 _packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 
 _short_description = "pylint-django is a Pylint plugin to aid Pylint in recognising and understanding" \
@@ -25,29 +25,17 @@ _classifiers = (
     'Intended Audience :: Developers',
     'Operating System :: Unix',
     'Topic :: Software Development :: Quality Assurance',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
 )
 
 
 _install_requires = [
-    'pylint-plugin-utils>=0.2.1'
+    'pylint-plugin-utils>=0.2.1',
+    'pylint>=1.8'
 ]
 
-
-if sys.version_info < (2, 7):
-    # pylint 1.4 dropped support for Python 2.6
-    _install_requires += [
-        'pylint>=1.0,<1.4',
-        'astroid>=1.0,<1.3.0',
-        'logilab-common>=0.60.0,<0.63',
-    ]
-else:
-    _install_requires += [
-        'pylint>=1.0',
-    ]
 
 setup(
     name='pylint-django',

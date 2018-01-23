@@ -2,7 +2,7 @@
 Checks that Pylint does not complain about various
 methods on Django form forms.
 """
-#  pylint: disable=C0111,R0904
+#  pylint: disable=missing-docstring,R0904
 from __future__ import print_function
 from datetime import datetime, date
 from django import forms
@@ -15,15 +15,13 @@ class ManyFieldsForm(forms.Form):
     datetimefield = forms.DateTimeField(auto_now_add=True)
     datefield = forms.DateField(auto_now_add=True)
     decimalfield = forms.DecimalField(max_digits=5, decimal_places=2)
+    durationfield = forms.DurationField()
     emailfield = forms.EmailField()
     filefield = forms.FileField(name='test_file', upload_to='test')
     filepathfield = forms.FilePathField(path='/some/path')
     floatfield = forms.FloatField()
     genericipaddressfield = forms.GenericIPAddressField()
     imagefield = forms.ImageField(name='test_image', upload_to='test')
-    # note: IPAdressField has been deprecated since django 1.7 so might not
-    # be available if using django 1.8+
-    ipaddressfield = getattr(forms, 'IPAddressField', 'GenericIPAddressField')()
     intfield = forms.IntegerField(null=True)
     nullbooleanfield = forms.NullBooleanField()
     slugfield = forms.SlugField()
@@ -59,6 +57,11 @@ class ManyFieldsForm(forms.Form):
 
     def decimalfield_tests(self):
         print(self.decimalfield.adjusted())
+
+    def durationfield_tests(self):
+        now = datetime.now()
+        print(now - self.durationfield)
+        print(self.durationfield.total_seconds())
 
     def filefield_tests(self):
         print(self.filefield)

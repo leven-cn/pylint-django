@@ -1,7 +1,7 @@
 """
 Checks that Pylint does not complain about foreign key sets on models
 """
-#  pylint: disable=C0111,W5101
+#  pylint: disable=missing-docstring
 
 from django.db import models
 
@@ -12,8 +12,8 @@ class SomeModel(models.Model):
 
 
 class OtherModel(models.Model):
-    something = models.ForeignKey(SomeModel)
-    elsething = models.OneToOneField(SomeModel)
+    something = models.ForeignKey(SomeModel, on_delete=models.CASCADE)
+    elsething = models.OneToOneField(SomeModel, on_delete=models.CASCADE)
 
     def something_doer(self):
         part_a = '%s - %s' % (self.something.name, self.something.timestamp)
